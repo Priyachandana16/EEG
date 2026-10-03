@@ -1,0 +1,327 @@
+\documentclass[conference,a4paper]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{mathptmx} 
+\usepackage[a4paper, top=17mm, bottom=25mm, left=13mm, right=13mm]{geometry}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Adaptive Confidence-Aware and Trust-Based EEG Framework for Multilevel Stress Detection, Uncertainty Estimation, and Selective Prediction\\
+
+}
+
+\author{
+\IEEEauthorblockN{1\textsuperscript{st} Mr. M. Pruthvi Raj}
+\IEEEauthorblockA{\textit{Sr. Asst. Prof, Dept. of CSE (AI\&ML)} \\
+\textit{Lakireddy Bali Reddy College of Engg.}\\
+Mylavaram, A.P, India \\
+jntupruthvi@gmail.com}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} T. Ranjithkumar}
+\IEEEauthorblockA{\textit{Student, Dept. of CSE (AI\&ML)} \\
+\textit{Lakireddy Bali Reddy College of Engg.}\\
+Mylavaram, A.P, India \\
+ranjithkumar3742@gmail.com}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} G. Harika}
+\IEEEauthorblockA{\textit{Student, Dept. of CSE (AI\&ML)} \\
+\textit{Lakireddy Bali Reddy College of Engg.}\\
+Mylavaram, A.P, India \\
+harikagajj12@gmail.com}
+\and
+\IEEEauthorblockN{\hspace*{2mm}4\textsuperscript{th} D. PriyaChandana}
+\IEEEauthorblockA{\hspace*{2mm}\textit{Student, Dept. of CSE (AI\&ML)} \\
+\hspace*{2mm}\textit{Lakireddy Bali Reddy College of Engg.}\\
+\hspace*{2mm}Mylavaram, A.P, India \\
+\hspace*{2mm}chandudevireddy67@gmail.com}
+\and
+\IEEEauthorblockN{\hspace*{2mm}5\textsuperscript{th} Ch. Babiji}
+\IEEEauthorblockA{\hspace*{2mm}\textit{Student, Dept. of CSE (AI\&ML)} \\
+\hspace*{2mm}\textit{Lakireddy Bali Reddy College of Engg.}\\
+\hspace*{2mm}Mylavaram, A.P, India \\
+\hspace*{2mm}babjichode7@gmail.com}
+\and
+\IEEEauthorblockN{\phantom{3\textsuperscript{rd} G. Harika}}
+\IEEEauthorblockA{\phantom{\textit{Student, Dept. of CSE (AI\&ML)}} \\
+\phantom{\textit{Lakireddy Bali Reddy College of Engg.}}\\
+\phantom{Mylavaram, A.P, India} \\
+\phantom{harikagajj12@gmail.com}}
+}
+\maketitle
+
+\begin{abstract}\mdseries
+EEG-based stress detection is a non-invasive measurement technique that offers objective stress detection of cognitive load and psychological health. But deep learning classifiers face challenges due to high inter-subject physiological variability, sensitivity to eye and muscle artifacts, false sense of security in classifications and lack of decision-making when the incoming biosignals are corrupted and/or ambiguous. To address these problems, in this paper, a select cognitive stress detection system is presented with a powerful “Trust Engine”. The architecture applies bandpass filtering (0.5--45~Hz), 50~Hz notch filtering and computes the Signal Quality Index (SQI) over 2.0-second non-overlapping windows to preprocess 14-channel EEG signals. Extracted features are then fed into a hybrid Multi-Scale 1D Convolutional Neural Network (CNN), 2-layer 64-hidden-unit Bidirectional Long Short-Term Memory (BiLSTM), and a 4-head Scaled Dot-Product Self-Attention model, where each model is implemented using a personal baseline Z-score normalization on resting segments. A multi-factor reliability engine is used to estimate epistemic uncertainty in real-time, using a combination of Temperature Scaling calibration ($T = 0.142$) and 20 Monte Carlo (MC) Dropout stochastic forward passes. With selective prediction, the system tries not to draw a conclusion when it is not sure enough to make one, resulting in an accepted output accuracy of about 95.06\%, much better than conventional forced-prediction models. The entire system runs on a zero-latency real-time dashboard created using Python Streamlit library, Plotly, and PyTorch.The system is implemented on a real-time dashboard, which is built using Python Streamlit library, Plotly, and PyTorch, that works without any latency. Experimental results over the STEW dataset show that ECE can be brought to the level of the minimum one can expect, and that the accuracy of selected samples is very good, in order to create a reliable decision-support framework in the real world, where only inferences that are unambiguous are drawn, and risky false positives are avoided.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Electroencephalography (EEG), Mental Stress Detection, Confidence Calibration, Epistemic Uncertainty, Monte Carlo Dropout, Selective Prediction.
+\end{IEEEkeywords}
+
+\section{INTRODUCTION}
+Cognitive overload and chronic mental stress significantly degrade human performance, impairing working memory and executive functioning. In high-stakes environments---ranging from aviation and surgical theaters to intensive academic examinations---these cognitive deficits drastically increase the risk of catastrophic failures. Historically, mental workload has been quantified using subjective self-assessment questionnaires, such as the Perceived Stress Scale (PSS), or by tracking peripheral autonomic responses like heart rate variability (HRV) and galvanic skin response (GSR). While these conventional methods are highly accessible, they suffer from intrinsic reporting biases, habituation, and severe response latency. Electroencephalography (EEG), by contrast, offers a direct window into cerebral neurodynamics. With millisecond-level resolution, EEG allows us to track the instantaneous cortical perturbations that are directly associated with psychological stress. Despite the obvious clinical utility of modern deep learning architectures, deploying EEG stress classifiers in real-world scenarios is hindered by a fundamental algorithmic vulnerability: the forced-prediction bottleneck. Traditional machine learning pipelines are programmed to execute deterministic classification on every single incoming data epoch. They force a prediction on 100\% of the temporal windows, even when the physiological signals are heavily obscured by muscular artifacts, or when the user's neurological state is genuinely ambiguous. This limitation is heavily compounded by the standard softmax activation function, which routinely assigns over-confident probability scores to corrupted or out-of-distribution biosignals. In practical decision-support environments, these silent failures are incredibly dangerous, as operators are misled by artificially high confidence metrics. This research resolves these critical deficiencies by proposing an end-to-end cybernetic monitoring system designed to classify cognitive workload using a 14-channel EEG array. Moving away from the dangerous paradigm of pure accuracy maximization, the proposed system introduces a powerful "Trust Engine." Rather than simply forcing an output, the architecture is designed to answer three distinct questions: What is the current cognitive state? How certain is the underlying mathematical model? Should this specific prediction be accepted or withheld?
+
+The major technical contributions of this study are:
+\begin{itemize}
+    \item \textbf{Hybrid Spatial-Temporal Architecture:} We introduce a Multi-Scale 1D Convolutional Neural Network (CNN) to extract spatial features across 14 channels. This is fused with a Bidirectional LSTM (BiLSTM) and a 4-head Scaled Dot-Product Self-Attention mechanism to capture long-range temporal dynamics and prioritize salient brain regions.
+    \item \textbf{Epistemic Uncertainty in EEG:} We pioneer the integration of Monte Carlo (MC) Dropout during inference specifically for raw EEG waveform analysis, providing a quantitative measurement of the model's internal doubt and epistemic variance.
+    \item \textbf{Selective Prediction (ACCEPT/ABSTAIN Gate):} We design a selective prediction mechanism demonstrating that forced predictions on noisy EEG data strictly degrade system reliability. By enforcing an uncertainty threshold ($\tau$), the network autonomously abstains on ambiguous segments, massively increasing operational trustworthiness.
+    \item \textbf{Zero-Latency Real-Time Dashboard:} We architect an end-to-end command center that executes live signal preprocessing, inference, and uncertainty rendering on 2.0-second epochs using Python Streamlit and Plotly, successfully decoupling the heavy inference engine from the frontend interface.
+\end{itemize}
+
+\section{LITERATURE SURVEY AND RELATED WORK}
+However, recent empirical studies have actively sought to apply classical machine learning and deep representation methods for mental workload and stress analysis from EEG signals. There has been a gradual transition from statistical features that were manually designed to deep learning features that are automatically extracted, in a systematical taxonomy of related literature, but a lack of reliability in the models still remains.
+
+\subsection{Classical Machine Learning Approaches}
+Initial frameworks were based on feature extraction in the frequency domain. Das et al. [3] employed Fast Fourier Transform (FFT) and simple CNN classifiers for the detection of examination-induced stress and attained high binary classes accuracy, but their work didn't focus on multi-level severity and show explainability. In a similar manner, classical methods based on Support Vector Machines (SVM) and LightGBM models were applied to statistical features from 19-channel arrays. These pipelines were computationally inexpensive, but failed to cope with inter-subject variability that was not stationary and did not offer any quantitative metrics of confidence.
+
+\subsection{Deep Learning and Forced Prediction Models}
+Recent benchmarks have been dominated by deep-learning based methods, in particular Convolutional Recurrent Neural Networks (CRNNs). Abdelfattah et al. [5] created extensive multimodal benchmarks based on the WESAD dataset, using Random Forests, XGBoost and CNN-RNN fusions. They do however depend on multi modal sensors (ECG, EDA, Respiration) which makes their setup more complex and expensive. 
+
+Importantly, the baseline setup for this domain, which was defined by Fernandez et al. [2] employed a set-up with 14 channels and deep learning, and this setup resulted in a respectable 86.24\% accuracy. This is a benchmark based on the paradigm of forced prediction, however. The network classifies each individual epoch, without considering the fidelity of the signal. This most basic fault will result in a pseudo-confidence of very corrupt data windows to arbitrarily high levels and fool the monitoring systems downstream of them.
+
+\subsection{The Gap: Calibration and Epistemic Uncertainty}
+Though deep temporal-spectral networks have been developed, current literature on EEG stress detection does not take in any universal aspects of post-hoc probability calibration and epistemic uncertainty modelling. Modern deep networks that have no calibration history exist for a relatively long time. The proposed framework is exactly the opposite: instead of the deterministic forced prediction, it is probabilistic, meaning that it is a selective abstention.
+\begin{table}[htbp]
+\renewcommand{\arraystretch}{1.4}
+\caption{Systematic Literature Survey and Comparative Positioning}
+\label{tab:lit_survey}
+\begin{center}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|p{1.3cm}|p{0.9cm}|p{1.5cm}|p{2.0cm}|p{1.8cm}|}
+\hline
+\textbf{Work \& Year} & \textbf{Signals} & \textbf{Methodology} & \textbf{Key Merits} & \textbf{Identified Limitations} \\
+\hline
+Das et al. [3] (2024) & EEG & FFT + CNN & High exam stress classification accuracy & Binary only; lacks uncertainty or calibration. \\
+\hline
+Vos et al. [4] (2025) & Review & Meta-Analysis & Identified hardware and artifact gaps & Meta-review; no novel architectural model. \\
+\hline
+Abdelfattah et al. [5] (2025) & Multi & RF, CNN-RNN & Comprehensive multimodal fusion & High hardware cost; lacks abstention logic. \\
+\hline
+Fernandez et al. [2] (2021) & 14-Ch EEG & Deep Learning & Achieved 86.24\% forced prediction accuracy & Forces 100\% predictions; high calibration error. \\
+\hline
+\textbf{Proposed Framework} & \textbf{14-Ch EEG} & \textbf{MS-CNN-BiLSTM-Attn} & \textbf{Personal calibration, Epistemic Trust Engine} & \textbf{Pioneers selective abstention gate on EEG.} \\
+\hline
+\end{tabular}%
+}
+\end{center}
+\end{table}
+
+\section{DATASET AND 10-STEP PREPROCESSING PIPELINE}
+The experimental framework is carefully assessed using the gold-standard STEW dataset (Simultaneous Task EEG Workload). The data set includes 48 subjects measured in two main experimental conditions: Resting Baseline (low workload/stress) and SIMKAP Multitasking protocol (high workload/stress). Data is acquired utilizing the Emotiv EPOC headset featuring a 14-channel array (AF3, F7, F3, FC5, T7, P7, O1, O2, P8, T8, FC6, F4, F8, AF4) sampled at 128~Hz.
+
+The proposed system is based on a strictly-structured ingestion and processing pipeline spanning 10 steps, to convert raw microvolt potentials into powerful and reliable feature vectors.
+
+\subsection{Signal Denoising and Filtering}
+\textbf{Step 1: Raw Ingest.} The system continuously streams 14 channels of raw EEG potentials at 128 Hz.
+
+\textbf{Step 2: Preprocessing.} To extract the neurophysiologically relevant cortical rhythms from the streams and to eliminate the electrogalvanic drift, the streams are filtered using a 4\textsuperscript{th}-order Butterworth band-pass filter with a passband from 0.5~Hz to 45~Hz. The Butterworth filter has a maximally flat pass-band. Also, a 50~Hz Infinite Impulse Response (IIR) notch filter is used to suppress alternating current (AC) mains hum and power line noise from the environment.
+
+\subsection{Signal Quality Index (SQI) and Windowing}
+\textbf{Step 3: Signal Quality Index (SQI).} Before feature extraction, each continuous stream segment is statistically evaluated. Spectral entropy and kurtosis are computed to detect abrupt non-physiological voltage spikes typical of electrode detachment, amplifier clipping, or severe electromyogenic (jaw clenching) artifacts.
+
+\textbf{Step 4: Temporal Windowing.} The continuous streams are partitioned using a 2.0-second non-overlapping rectangular window. Given the 128~Hz sampling rate, this yields a discrete matrix $\mathbf{X} \in \mathbb{R}^{256 \times 14}$ representing 256 timepoints across 14 spatial locations..
+
+\subsection{Personalized Baseline Calibration}
+\textbf{Step 5: Baseline Normalization.} These covariate shifts are very large due to variations between subjects for cranial bone thickness, baseline arousal and electrode impedance. The proposed system is using Adaptive Baseline Calibration to match the data distribution. Mean $\mu_{i, \text{rest}}$ and standard deviation $\sigma_{i, \text{rest}}$ are calculated for each subject $i$ in the baseline (rest) condition. Task windows received on the input receive Z-score normalization based on this individual baseline:
+\begin{equation}
+Z_{t} = \frac{X_{t} - \mu_{i, \text{rest}}}{\sigma_{i, \text{rest}} + \epsilon}
+\end{equation}
+where the numerical stability is guaranteed by the presence of the factor $\epsilon = 10^{-6}$. This makes the neural network learn physiological deviations instead of microvolt numbers.
+
+% ---------------------------------------------------------
+% Placeholder Box for Pipeline Figure
+% Insert your image file name here (e.g., pipeline.png)
+% ---------------------------------------------------------
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{fig1.png}
+\caption{Systematic block diagram of the proposed 10 step pipeline starting from raw 14-channel ingestion to the selective prediction gate.}
+\label{fig:pipeline}
+\end{figure}
+
+\section{DEEP SPATIAL-TEMPORAL ARCHITECTURE}
+The normalized matrices are then directed to a sophisticated hybrid neural network architecture that aims to learn localized spectral perturbations and extended cognitive transitions.
+
+\subsection{Multi-Scale 1D Convolution (Step 6)}
+The network starts with two 1D convolution layers run in parallel to capture the spatial-temporal rhythms within the time dimension. The network uses two different receptive field kernels (k=5 and k=11) to capture both high-frequency gamma bursts (short lived, localised features) and slow-wave delta/theta oscillations (long lived, temporal features).
+\begin{equation}
+h_{\text{cnn}} = \text{ReLU}(\text{BatchNorm}(\mathbf{W} * Z_{t} + \mathbf{b}))
+\end{equation}
+
+\subsection{Bidirectional LSTM (Step 7)}
+The effects of cognitive stress are not immediate, but develop over time and fade over time. So the CNN feature maps are fed into the Bidirectional Long Short-Term Memory (BiLSTM) network, which has two layers of 64 hidden units, to capture the sequential dynamics. In the BiLSTM, the hidden state is computed twice: forward, $\vec{h}_t$ and backward, $\overleftarrow{h}_t$; the hidden state is concatenated to ensure the contextual information of past and future of the epoch is maintained.
+
+\subsection{Multi-Head Self-Attention (Step 8)}
+Not every EEG channels is equally associated with stress detection; for example, frontal asymmetry (F3/F4) is a strong indicator of emotional regulation and occipital areas are mostly related to visual load. The 4-head Scaled Dot-Product Attention layer learns the importance of features on a per-sequence basis. The outputs of the BiLSTM are linearly projected to obtain Queries ($Q$), Keys ($K$), and Values ($V$):
+
+\begin{equation}
+\text{Attention}(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V
+\end{equation}
+The dimensionality of key vectors, $d_k$. This mechanism directs the network to dynamically activate the most salient brain regions as a function of the momentary cognitive task.
+
+% ---------------------------------------------------------
+% Placeholder Box for Attention Mechanism Figure
+% Insert your image file name here (e.g., attention.png)
+% ---------------------------------------------------------
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{fig2.png}
+\caption{Mathematical flow of the 4-Head Scaled Dot-Product Self-Attention module dynamically weighting salient cortical regions.}
+\label{fig:attention}
+\end{figure}
+
+\section{THE TRUST ENGINE AND SELECTIVE GATE}
+The core innovation of the proposed framework lies in abandoning forced deterministic classification in favor of probabilistic, uncertainty-aware selective abstention.
+
+\subsection{Confidence Calibration via Temperature Scaling}
+The raw network logits $z_i$ from deep models are in general uncalibrated, meaning that they often generate pseudo-probabilities greater than $0.99$ even when the data is noisy. Temperature Scaling is used to transform logits to true correctness likelihoods. We use a learned parameter $T$ ($T = 0.142$ optimized over a validation set of negative log-likelihood) that penalizes the softmax distribution:
+\begin{equation}
+\hat{p}_i = \frac{\exp(z_i / T)}{\sum_j \exp(z_j / T)}
+\end{equation}
+The calibrated confidence score $C$ is taken as $C = \max_i \hat{p}_i$.
+
+\subsection{Epistemic Uncertainty via Monte Carlo Dropout (Step 9)}
+While Temperature Scaling calibrates confidence (aleatoric uncertainty), it cannot measure (epistemic uncertainty) the uncertainty in the model due to its internal uncertainty. This is a novel implementation of Monte Carlo (MC) Dropout on raw EEG representations. At the time of inference the dropout layers (p = 0.3) are activated. 
+
+For each incoming 2.0-second window, the system performs $M = 20$ stochastic forward passes. Due to the dropout, each pass generates a slightly different probability distribution. The epistemic uncertainty $U$ is computed as the normalized predictive entropy (variance) across these 20 passes:
+\begin{equation}
+U = - \frac{1}{\log K} \sum_{k=1}^K \bar{p}_k \log \bar{p}_k
+\end{equation}
+where $\bar{p}_k = \frac{1}{M} \sum_{m=1}^M \hat{p}_{k}^{(m)}$ is the mean probability for class $k$ across the $M$ stochastic forward passes.
+
+\subsection{The Selective Prediction Gate (Step 10)}
+The system has a strict logical safety gate, controlled by a hyperparameter $\tau$. The model is given an uncertainty threshold, and thus the freedom to say "I don't know."
+
+\begin{equation}
+\text{Decision} = 
+\begin{cases} 
+\text{ACCEPT } (\hat{y}) & \text{if } U \leq 0.080 \\
+\text{ABSTAIN } (null) & \text{if } U > 0.080 
+\end{cases}
+\end{equation}
+Windows with $U > 0.080$ are rejected from the clinical presentation and no action can be taken by the operator or by an autonomous monitor because it is a hallucination or a corrupted prediction.
+
+\section{SYSTEM IMPLEMENTATION AND DASHBOARD ARCHITECTURE}
+The architecture is implemented as a powerful backend-API and a zero-latency presentation-frontend in order to show real-world feasibility.  
+
+The inference model is built with Python 3.10+ and PyTorch in the backend machine learning engine, and the DSP filtering is done with SciPy and NumPy.
+
+The Executive Dashboard frontend can be created without heavy web frameworks to ensure absolute stability. It is constructed using Python Streamlit and Plotly. The user interface is designed with a modern and sleek Glassmorphism style and Aurora mesh gradient backgrounds. The live 14-channel scrolling EEG monitor is rendered natively to the high performance caching, which means there is no overhead in websocket latency between the two.
+
+
+% ---------------------------------------------------------
+% Placeholder Box for Dashboard Wireframe Figure
+% Insert your image file name here (e.g., dashboard.png)
+% ---------------------------------------------------------
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\columnwidth]{fig3.png}
+\caption{Wireframe architecture of the Streamlit and Plotly-driven zero-latency Executive Dashboard.}
+\label{fig:dashboard}
+\end{figure}
+
+\section{EXPERIMENT SETTING AND PERFORMANCE ANALYSIS}
+
+\subsection{Training and Hyperparameter Configuration}
+The model is trained for more than 150 epochs using the Adam optimizer with an initial learning rate of $1 \times 10^{-3}$, which is dynamically reduced using the Cosine Annealing scheduler. A batch size of 64 is used. Five-fold subject independent cross validation is used to partition the data in a rigid way so that the network learns to generalize to completely new physiological phenotypes, and not memorize each individual subject.
+
+\subsection{Classification Performance Comparison}
+Table~\ref{tab:perf_comp} compares The proposed proposed architecture is compared with the baseline machine learning architecture in Table~\ref{tab:perf_comp}. In the base paper, Fernandez et al. (2021), 86.24\% was obtained by applying deterministic predictions in all 100\% of the validation windows.
+
+The overall accuracy of the system is 92.50\% which is the same as the CNN-BiLSTM-Attention feature extractor without selective gate. The real power of the system is unlocked after the activation of the Trust Engine, raising the accepted window accuracy to 95.06\%.
+\begin{table}[htbp]
+\renewcommand{\arraystretch}{1.4}
+\caption{Classification Performance Across Machine Learning Models}
+\label{tab:perf_comp}
+\begin{center}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Model Architecture / Paradigm} & \textbf{Prediction Policy} & \textbf{Accuracy} \\
+\hline
+Base Paper (Fernandez et al., 2021) & Forced (100\%) & 86.24\% \\
+\textbf{Proposed (No Gate)} & \textbf{Forced (100\%)} & \textbf{92.50\%} \\
+\textbf{Proposed (With Selective Gate)} & \textbf{Selective (82.5\%)} & \textbf{95.06\%} \\
+\hline
+\end{tabular}%
+}
+\end{center}
+\end{table}
+
+\subsection{Confidence Calibration and Temperature Scaling}
+As demonstrated in Table~\ref{tab:ece}, pre-calibration networks have a dangerous sense of self-confidence. After optimizing $T = 1.84$ the Expected Calibration Error (ECE) is dramatically decreased from 0.084 to 0.021. This means that the system has a 85\% probability of high stress when it indicates that stress is high, and is historically correct 85\% of the time, enabling mathematically sound downstream decision-making.
+
+\begin{table}[htbp]
+\renewcommand{\arraystretch}{1.4}
+\caption{Calibration Metrics Pre- and Post-Temperature Scaling}
+\label{tab:ece}
+\begin{center}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Configuration} & \textbf{ECE} & \textbf{Status} \\
+\hline
+Before Temperature Scaling & 0.084 & Over-Confident \\
+After Temperature Scaling ($T = 0.142$) & \textbf{0.021} & \textbf{Highly Calibrated} \\
+\hline
+\end{tabular}%
+}
+\end{center}
+\end{table}
+
+\subsection{Selective Prediction and Risk-Coverage Trade-off}
+The most significant impacts are seen in Risk-Coverage analysis (Table~\ref{tab:selective}). The model has a threshold of uncertainty $\tau = 0.85$ and makes predictions only for the least ambiguous and/or artifact-corrupted fraction of data epochs, ~17.5\%.
+
+The system's "Coverage" falls to 82.50\%, but the accuracy on the ACCEPTED windows has a significant improvement over the Fernandez et al. base paper, and is now at a very trustworthy 95.06\%. This validates our main hypothesis: Reliability in general is only hurt by imposing predictions on noisy EEG data.
+
+\begin{table}[htbp]
+\renewcommand{\arraystretch}{1.4}
+\caption{Risk-Coverage Trade-off Under Selective Prediction}
+\label{tab:selective}
+\begin{center}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Threshold ($\tau$)} & \textbf{Coverage (\%)} & \textbf{Accepted Accuracy (\%)} & \textbf{System Action} \\
+\hline
+No Gate (Forced) & 100.0\% & 92.50\% & Force Prediction \\
+$\tau = 0.50$ & 94.20\% & 93.15\% & Reject Severe Noise \\
+$\tau = 0.85$ (Optimal) & \textbf{82.50\%} & \textbf{95.06\%} & \textbf{Reject Ambiguity} \\
+$\tau = 0.95$ (Strict) & 71.00\% & 96.50\% & Retain High-Purity \\
+\hline
+\end{tabular}%
+}
+\end{center}
+\end{table}
+
+\section{CONCLUSION AND FUTURE WORK}
+This research proposed a selective cognitive stress detection system which overcame almost all the weaknesses of the contemporary deep neural networks in regard to the effect on the biosignals influenced by any volatility. The hybrid CNN-BiLSTM-Attention architecture, combined with a powerful Trust Engine, enables the system to break free from the flawed forced-prediction paradigm. 
+
+The use of Monte Carlo dropout epistemic uncertainty calculations along with post-hoc Temperature Scaling properly calibrated the network, resulting in an unprecedented ECE of 0.021. More importantly, the selective prediction gate ACCEPT/ABSTAIN was able to correctly identify and postpone decisions for the most uncertain 17.5 per cent of data windows. This independent separation boosted the accepted prediction accuracy to an impressive 95.06\%. Alongside an executive dashboard in Python Streamlit and Plotly that has no delay, the proposed system offers a computational-efficient and extremely reliable one that is ideally suited to real-time cognitive monitoring, surgical workload tracking, and high-stakes decision-support scenarios in which a false prediction is far more perilous than a delayed one.
+
+Future developmental trajectories will involve training the baseline normalization parameters to dynamically adapt to diurnal physiological changes via low-rank adaptation (LoRA) for on-edge continuous fine-tuning.
+\begin{thebibliography}{00}
+\bibitem{b1} W. L. Lim, O. Sourina, and L. P. Wang, ``STEW: Simultaneous Task EEG Workload Data Set,'' \textit{IEEE Transactions on Neural Systems and Rehabilitation Engineering}, vol. 26, no. 11, pp. 2106--2114, Nov. 2018.
+\bibitem{b2} J. Fernandez, R. Mart{\'i}nez, B. Innocenti, and B. Lopez, ``Contribution of EEG Signals for Students' Stress Detection,'' \textit{IEEE Transactions on Affective Computing}, 2021.
+\bibitem{b3} S. Das, S. Chatterjee, A. I. Karani, and A. K. Ghosh, ``Stress Detection While Doing Exam Using EEG with Machine Learning Techniques,'' in \textit{Lecture Notes in Networks and Systems}, Springer, 2024, pp. 112--124.
+\bibitem{b4} G. Vos, M. Ebrahimpour, L. van Eijk, Z. Sarnyai, and M. R. Azghadi, ``Stress Monitoring Using Low-Cost Electroencephalogram Devices: A Systematic Literature Review,'' \textit{International Journal of Medical Informatics}, vol. 198, 105432, 2025.
+\bibitem{b5} E. Abdelfattah, S. Joshi, and S. Tiwari, ``Machine and Deep Learning Models for Stress Detection Using Multimodal Physiological Data,'' \textit{IEEE Access}, vol. 13, pp. 4597--4617, 2025.
+\bibitem{b6} Y. Gal and Z. Ghahramani, ``Dropout as a Bayesian approximation: Representing model uncertainty in deep learning,'' in \textit{Proc. of the 33rd International Conference on Machine Learning (ICML)}, 2016, pp. 1050--1059.
+\bibitem{b7} C. Guo, G. Pleiss, Y. Sun, and K. Q. Weinberger, ``On calibration of modern neural networks,'' in \textit{Proc. of the 34th International Conference on Machine Learning (ICML)}, 2017, pp. 1321--1330.
+\bibitem{b8} A. Vaswani \textit{et al.}, ``Attention is all you need,'' in \textit{Advances in Neural Information Processing Systems (NeurIPS)}, vol. 30, 2017.
+\bibitem{b9} R. El-Yaniv and Y. Wiener, ``On the foundations of noise-free selective classification,'' \textit{Journal of Machine Learning Research}, vol. 11, pp. 1605--1641, 2010.
+\bibitem{b10} X. Li \textit{et al.}, ``A hybrid deep learning approach for robust EEG-based emotion recognition,'' \textit{IEEE Transactions on Neural Systems and Rehabilitation Engineering}, vol. 29, pp. 624--633, 2021.
+\end{thebibliography}
+
+\end{document}

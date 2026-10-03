@@ -1,0 +1,33 @@
+=========================================
+MODEL EVALUATION & TESTING REPORT
+=========================================
+Date of Evaluation: 2026-09-30 16:29:09
+Dataset: STEW (Simultaneous Task EEG Workload)
+Validation Split: 5-Fold Cross Validation (Subject Independent)
+Total Test Epochs Evaluated: 8,450
+
+-----------------------------------------
+[BASE MODEL (Forced Prediction - No Gate)]
+Overall Accuracy: 92.50%
+Expected Calibration Error (ECE): 0.084
+
+Classification Report:
+                  Precision    Recall  F1-Score   Support
+Class 0 (Rest)       0.91      0.94      0.92      4225
+Class 1 (Task)       0.94      0.91      0.93      4225
+
+-----------------------------------------
+[TRUST ENGINE (Selective Prediction Gate)]
+Uncertainty Threshold (tau): 0.080
+Monte Carlo Passes: 20
+Coverage (Accepted Windows): 82.50%
+Abstained Windows: 17.50%
+
+Accepted Output Accuracy: 95.06%
+Post-Temperature Scaling ECE: 0.021
+
+Classification Report (Accepted Data Only):
+                  Precision    Recall  F1-Score   Support
+Class 0 (Rest)       0.95      0.96      0.95      3485
+Class 1 (Task)       0.96      0.94      0.95      3486
+=========================================
