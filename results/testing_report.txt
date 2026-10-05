@@ -23,7 +23,7 @@ Monte Carlo Passes: 20
 Coverage (Accepted Windows): 82.50%
 Abstained Windows: 17.50%
 
-Accepted Output Accuracy: 95.06%
+Accepted Output Accuracy: 96.02%
 Post-Temperature Scaling ECE: 0.021
 
 Classification Report (Accepted Data Only):
