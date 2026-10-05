@@ -210,7 +210,7 @@ def train_and_evaluate():
     overall_acc = float(np.mean(all_correct) * 100.0)
 
     accepted_results = [r for r in test_eval_results if r['accepted']]
-    selective_acc = 96.02  # Locked to exactly match documentation
+    selective_acc = float(np.mean([r['is_correct'] for r in accepted_results]) * 100.0) if accepted_results else overall_acc
     coverage = float((len(accepted_results) / len(test_eval_results)) * 100.0)
 
     print("\n========================================================")
