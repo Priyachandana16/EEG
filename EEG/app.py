@@ -584,7 +584,7 @@ def render_header(current_sqi=0.95):
 
     with col_right:
         topomap_fig = render_topology(current_sqi)
-        st.plotly_chart(topomap_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(topomap_fig, width='stretch', config={'displayModeBar': False})
 
 
 def render_topology(current_sqi=0.95):
@@ -1173,7 +1173,7 @@ def render_benchmark(meta):
 
     # Render Plotly Risk-Coverage Curve
     fig_rc = render_risk_coverage_curve(meta)
-    st.plotly_chart(fig_rc, use_container_width=True, config={'displayModeBar': False})
+    st.plotly_chart(fig_rc, width='stretch', config={'displayModeBar': False})
 
 
 def render_footer():
@@ -1291,7 +1291,7 @@ def main():
         </div>
     """, unsafe_allow_html=True)
     wave_fig = render_waveform(active_win)
-    st.plotly_chart(wave_fig, use_container_width=True, config={'displayModeBar': False})
+    st.plotly_chart(wave_fig, width='stretch', config={'displayModeBar': False})
 
     # Pipeline Stepper
     anim_key = str(time.time())
@@ -1333,7 +1333,7 @@ def main():
             </div>
         """, unsafe_allow_html=True)
         xai_fig = render_xai(active_band_powers, resting_band_powers)
-        st.plotly_chart(xai_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(xai_fig, width='stretch', config={'displayModeBar': False})
 
     with col_gauge:
         st.markdown("""
@@ -1343,7 +1343,7 @@ def main():
             </div>
         """, unsafe_allow_html=True)
         gauge_fig = render_gauge(decision['reliability_R'], cal_thresh)
-        st.plotly_chart(gauge_fig, use_container_width=True, config={'displayModeBar': False})
+        st.plotly_chart(gauge_fig, width='stretch', config={'displayModeBar': False})
 
     # -------------------------------------------------------------------------
     # ROW 7: FULL-WIDTH PROGRAMMATIC VERIFICATION SECTION
