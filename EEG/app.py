@@ -175,14 +175,14 @@ def inject_css():
 
         /* Hero Section Premium Treatment */
         .hero-title {
-            font-size: 3.2rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            letter-spacing: -1.5px;
+            letter-spacing: -1.0px;
             background: linear-gradient(135deg, #FFFFFF 0%, #C084FC 45%, #2DD4BF 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0 0 12px 0;
-            line-height: 1.1;
+            line-height: 1.2;
             filter: drop-shadow(0 4px 20px rgba(192, 132, 252, 0.25));
         }
         .hero-subtitle {
