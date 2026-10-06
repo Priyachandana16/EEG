@@ -569,7 +569,7 @@ def render_header(current_sqi=0.95):
     col_left, col_right = st.columns([9, 3])
     with col_left:
         st.markdown("""
-        <h2 class='hero-title'>Adaptive Confidence-Aware EEG Framework for Multilevel Stress Detection and Selective Prediction</h2>
+        <h1 class='hero-title'>Adaptive Confidence-Aware EEG Framework for Multilevel Stress Detection and Selective Prediction</h1>
         <p class='hero-desc'>
             Detects mental workload from brainwaves, and abstains from predicting when it is not confident.
         </p>

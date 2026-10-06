@@ -1,9 +1,9 @@
 {
-  "temperature": 0.142,
-  "overall_accuracy": 89.67,
-  "selective_accuracy": 96.02,
-  "coverage": 87.7,
-  "ece_calibrated": 0.0074,
-  "ece_uncalibrated": 0.0071,
+  "temperature": 1.3839453125,
+  "overall_accuracy": 88.66666666666667,
+  "selective_accuracy": 98.08612440191388,
+  "coverage": 69.66666666666667,
+  "ece_calibrated": 0.006757513284683277,
+  "ece_uncalibrated": 0.004768373767534839,
   "threshold": 0.85
 }
