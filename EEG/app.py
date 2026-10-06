@@ -26,7 +26,7 @@ import train_and_verify
 # PAGE CONFIGURATION
 # -----------------------------------------------------------------------------
 st.set_page_config(
-    page_title="Adaptive Confidence-Aware and Trust-Based EEG Framework",
+    page_title="Adaptive Confidence-Aware EEG Framework",
     page_icon="🧠",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -569,8 +569,8 @@ def render_header(current_sqi=0.95):
     col_left, col_right = st.columns([9, 3])
     with col_left:
         st.markdown("""
-        <h1 class='hero-title'>Adaptive Confidence-Aware and Trust-Based EEG Framework</h1>
-        <p class='hero-subtitle'>Multilevel Stress Detection, Uncertainty Estimation, and Selective Prediction</p>
+        <h1 class='hero-title'>Adaptive Confidence-Aware EEG Framework</h1>
+        <p class='hero-subtitle'>Multilevel Stress Detection and Selective Prediction</p>
         <p class='hero-desc'>
             Detects mental workload from brainwaves, and abstains from predicting when it is not confident.
         </p>
