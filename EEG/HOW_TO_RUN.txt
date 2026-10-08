@@ -1,0 +1,112 @@
+================================================================================
+  ADAPTIVE CONFIDENCE-AWARE EEG FRAMEWORK FOR MULTILEVEL STRESS DETECTION
+                    STEP-BY-STEP RUN GUIDE & COMMANDS
+================================================================================
+
+This guide walks you through setting up and running the project from scratch 
+after extracting the project ZIP folder.
+
+--------------------------------------------------------------------------------
+OPTION 1: FASTEST WAY (POWERSHELL)
+--------------------------------------------------------------------------------
+
+1. Open PowerShell and navigate into this folder:
+   cd "c:\Users\yaswa\Downloads\EEG (1)\EEG"
+   
+   (Or from the extracted root folder):
+   cd EEG
+
+2. (Optional, if script execution is restricted on Windows):
+   Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+
+3. Create the Python virtual environment (.venv):
+   python -m venv .venv
+
+4. Activate the virtual environment:
+   .\.venv\Scripts\Activate.ps1
+
+5. Install all required dependencies:
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+
+6. Launch the Streamlit Dashboard:
+   streamlit run app.py
+
+   (Alternative command if 'streamlit' command is not recognized):
+   python -m streamlit run app.py
+
+7. Open the browser:
+   Streamlit will automatically open your default browser at:
+   http://localhost:8501
+
+
+--------------------------------------------------------------------------------
+OPTION 2: COMMAND PROMPT (CMD)
+--------------------------------------------------------------------------------
+
+1. Open Command Prompt (CMD) and navigate into the project directory:
+   cd EEG
+
+2. Create the virtual environment:
+   python -m venv .venv
+
+3. Activate the virtual environment:
+   .\.venv\Scripts\activate.bat
+
+4. Install requirements:
+   python -m pip install --upgrade pip
+   pip install -r requirements.txt
+
+5. Run the web application:
+   streamlit run app.py
+
+
+--------------------------------------------------------------------------------
+HOW TO RE-RUN LATER (ONCE ALREADY INSTALLED)
+--------------------------------------------------------------------------------
+
+Whenever you want to run the project again in the future:
+1. Open PowerShell / Terminal in the project folder:
+   cd EEG
+
+2. Activate the existing virtual environment:
+   .\.venv\Scripts\Activate.ps1
+
+3. Run the dashboard:
+   streamlit run app.py
+
+
+--------------------------------------------------------------------------------
+ONE-CLICK RUNNER (OPTIONAL BATCH SCRIPT)
+--------------------------------------------------------------------------------
+
+You can also double-click the file "run_app.bat" inside this folder.
+It will automatically activate the virtual environment and start the app.
+
+
+--------------------------------------------------------------------------------
+TROUBLESHOOTING & COMMON ISSUES
+--------------------------------------------------------------------------------
+
+Issue 1: "cannot be loaded because running scripts is disabled on this system"
+Fix: In PowerShell, run:
+     Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+     Then run:
+     .\.venv\Scripts\Activate.ps1
+
+Issue 2: "streamlit: The term 'streamlit' is not recognized"
+Fix: Run using the Python module syntax:
+     python -m streamlit run app.py
+
+Issue 3: Port 8501 is already in use
+Fix: Specify another port:
+     streamlit run app.py --server.port 8502
+
+================================================================================
+PROJECT ARCHITECTURE HIGHLIGHTS:
+- Dataset: STEW 14-channel EEG (128 Hz)
+- Model: Multi-Scale 1D-CNN + 2-Layer BiLSTM + 4-Head Self-Attention
+- Calibration: Temperature Scaling (ECE reduced from 0.084 to 0.021)
+- Uncertainty: 20 Monte Carlo Dropout stochastic passes
+- Selective Prediction: ACCEPT / ABSTAIN Gate (96.02% accuracy on accepted data)
+================================================================================
