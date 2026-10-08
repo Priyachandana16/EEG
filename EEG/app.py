@@ -549,8 +549,8 @@ def get_cached_subject_data(subject_id):
     prep_lo = preprocess_signal(raw_data_lo)
     prep_hi = preprocess_signal(raw_data_hi)
 
-    wins_lo, sqi_lo, _ = segment_windows(prep_lo)
-    wins_hi, sqi_hi, _ = segment_windows(prep_hi)
+    wins_lo, sqi_lo, _ = segment_windows(prep_lo, window_size=256, step_size=256)
+    wins_hi, sqi_hi, _ = segment_windows(prep_hi, window_size=256, step_size=256)
 
     # 30-window resting personal baseline
     mu_baseline = extract_subject_baseline(wins_lo[:30])
@@ -1224,17 +1224,22 @@ def main():
     # HERO ROW: Header + Electrode Topology
     render_header(current_sqi=active_sqi)
 
-    # TIME WINDOW SLIDER CARD
+    # TIME WINDOW SLIDER CARD (Moves in 2-second intervals: 0s, 2s, 4s, 6s...)
     col_slide, col_time = st.columns([9, 3])
     with col_slide:
-        new_win_idx = st.slider(
+        max_time_sec = (n_total_wins - 1) * 2
+        current_time_sec = min(win_idx * 2, max_time_sec)
+        selected_time_sec = st.slider(
             "Select 2-Second Time Window",
             min_value=0,
-            max_value=n_total_wins - 1,
-            value=win_idx,
-            help="Scrub through consecutive 2-second segmented epochs (150-second total trial duration)."
+            max_value=max_time_sec,
+            value=current_time_sec,
+            step=2,
+            format="%d s",
+            help="Scrub through consecutive 2-second epochs in 2-second intervals (0s, 2s, 4s, 6s... up to 150s total trial duration)."
         )
         if not run_live:
+            new_win_idx = selected_time_sec // 2
             st.session_state['win_idx'] = new_win_idx
             win_idx = new_win_idx
             active_win = current_windows[win_idx]

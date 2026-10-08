@@ -11,8 +11,8 @@ CHANNELS = ['AF3', 'F7', 'F3', 'FC5', 'T7', 'P7', 'O1', 'O2', 'P8', 'T8', 'FC6',
 SAMPLING_RATE = 128  # Hz
 WINDOW_SEC = 2.0     # seconds
 WINDOW_SIZE = int(SAMPLING_RATE * WINDOW_SEC)  # 256 samples
-OVERLAP_RATIO = 0.5
-STEP_SIZE = int(WINDOW_SIZE * (1 - OVERLAP_RATIO))  # 128 samples
+OVERLAP_RATIO = 0.0   # Non-overlapping 2-second windows (matches Slide 7)
+STEP_SIZE = int(WINDOW_SIZE * (1 - OVERLAP_RATIO))  # 256 samples
 
 
 def butter_bandpass_filter(data, lowcut=0.5, highcut=45.0, fs=128, order=4):
@@ -123,9 +123,9 @@ def compute_sqi(window_data):
     return sqi_score, is_corrupted, metrics
 
 
-def segment_windows(eeg_data, window_size=256, step_size=128):
+def segment_windows(eeg_data, window_size=256, step_size=256):
     """
-    Segments raw continuous EEG data into 2.0-sec sliding windows with 50% overlap.
+    Segments raw continuous EEG data into 2.0-sec non-overlapping windows (256 samples).
     
     eeg_data shape: (14, total_samples)
     returns: windows of shape (N, 14, 256), list of sqi_scores
