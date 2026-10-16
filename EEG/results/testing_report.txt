@@ -7,14 +7,14 @@ Total Test Windows Evaluated: 600
 
 -----------------------------------------
 [BASE MODEL (Forced Prediction - No Gate)]
-Overall Accuracy: 95.33%
-Expected Calibration Error (ECE): 0.0366
+Overall Accuracy: 95.00%
+Expected Calibration Error (ECE): 0.0412
 
 Classification Report (All Test Windows):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)       0.93      0.98      0.95       300
-Stress (Class 1)       0.98      0.93      0.95       300
+  Rest (Class 0)       0.99      0.91      0.95       300
+Stress (Class 1)       0.92      0.99      0.95       300
 
         accuracy                           0.95       600
        macro avg       0.95      0.95      0.95       600
@@ -25,20 +25,20 @@ Stress (Class 1)       0.98      0.93      0.95       300
 [TRUST ENGINE (Selective Prediction Gate)]
 Reliability Threshold (tau): 0.850
 Monte Carlo Passes: 20
-Coverage (Accepted Windows): 71.00% (426/600)
-Abstained Windows: 29.00% (174/600)
+Coverage (Accepted Windows): 66.33% (398/600)
+Abstained Windows: 33.67% (202/600)
 
-Accepted Output Accuracy: 99.30%
-Post-Temperature Scaling ECE: 0.0113
+Accepted Output Accuracy: 98.99%
+Post-Temperature Scaling ECE: 0.0098
 
 Classification Report (Accepted Windows Only):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)       0.99      1.00      0.99       254
-Stress (Class 1)       1.00      0.98      0.99       172
+  Rest (Class 0)       0.99      0.98      0.99       180
+Stress (Class 1)       0.99      1.00      0.99       218
 
-        accuracy                           0.99       426
-       macro avg       0.99      0.99      0.99       426
-    weighted avg       0.99      0.99      0.99       426
+        accuracy                           0.99       398
+       macro avg       0.99      0.99      0.99       398
+    weighted avg       0.99      0.99      0.99       398
 
 =========================================

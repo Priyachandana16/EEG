@@ -1,10 +1,10 @@
 {
   "dataset": "STEW",
   "total_test_windows": 600,
-  "overall_accuracy": 95.33,
-  "selective_accuracy": 99.3,
-  "coverage": 71.0,
-  "calibrated_ece": 0.0113,
-  "temperature": 2.14,
+  "overall_accuracy": 95.0,
+  "selective_accuracy": 98.99,
+  "coverage": 66.33,
+  "calibrated_ece": 0.0098,
+  "temperature": 1.928,
   "status": "AUTHENTIC_VERIFIED"
 }
