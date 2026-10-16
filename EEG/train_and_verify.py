@@ -44,7 +44,7 @@ def build_subject_features_and_windows(n_subs=30, max_wins_per_cond=60):
     - Extract feature vectors and z-normalize with personal baseline.
     """
     print(f"Ingesting & processing dataset for {n_subs} subjects (up to {max_wins_per_cond} windows/condition)...", flush=True)
-    raw_dir = ensure_stew_dataset(force=False)
+    raw_dir = ensure_stew_dataset(force=True)
 
     subject_data = []
 
