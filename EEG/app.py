@@ -7,6 +7,7 @@ Clinical Neuro-Tech Dark Edition
 import os
 import time
 import json
+import pickle
 import numpy as np
 import pandas as pd
 import torch
@@ -515,13 +516,14 @@ def get_plotly_layout(height=300, **kwargs):
 @st.cache_resource
 def load_system_assets():
     """
-    Loads model and calibration artifacts. Caches resource in memory.
+    Loads model, PCA pipeline, and calibration artifacts. Caches resource in memory.
     """
     ensure_stew_dataset()
     meta_path = 'assets/calibration_meta.json'
     model_path = 'assets/stew_model.pt'
+    pca_path = 'assets/pca_pipeline.pkl'
 
-    if not os.path.exists(meta_path) or not os.path.exists(model_path):
+    if not os.path.exists(meta_path) or not os.path.exists(model_path) or not os.path.exists(pca_path):
         train_and_verify.train_and_evaluate()
 
     model = HybridNeuroNet(in_channels=14, feature_dim=64, lstm_hidden=64, num_heads=4, dropout_rate=0.3)
@@ -531,10 +533,13 @@ def load_system_assets():
     with open(meta_path, 'r') as f:
         meta = json.load(f)
 
-    temp_scaler = TemperatureScaler()
-    temp_scaler.temperature = meta.get('temperature', 0.142)
+    with open(pca_path, 'rb') as f:
+        pca_pipeline = pickle.load(f)
 
-    return model, temp_scaler, meta
+    temp_scaler = TemperatureScaler()
+    temp_scaler.temperature = meta.get('temperature', 1.0)
+
+    return model, temp_scaler, meta, pca_pipeline
 
 
 @st.cache_data
@@ -734,6 +739,9 @@ def render_sidebar(meta):
 
         st.markdown("<div class='sidebar-section-label'>📊 Benchmark Metrics</div>", unsafe_allow_html=True)
 
+        ai_acc = meta.get('selective_accuracy', 96.02)
+        cal_temp = meta.get('temperature', 1.0)
+
         # Compact Benchmark KPI Cards
         st.markdown(f"""
         <div class='bench-metric-card'>
@@ -743,12 +751,12 @@ def render_sidebar(meta):
         <div class='bench-metric-card'>
             <div class='bench-metric-label'>Our AI Accuracy</div>
             <div class='bench-metric-value' style='color:#10B981;'>
-                96.02% 
+                {ai_acc:.2f}% 
             </div>
         </div>
         <div class='bench-metric-card'>
             <div class='bench-metric-label'>Calibrated Temp (T)</div>
-            <div class='bench-metric-value' style='color:#A78BFA;'>0.142</div>
+            <div class='bench-metric-value' style='color:#A78BFA;'>{cal_temp:.3f}</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1056,9 +1064,10 @@ def render_risk_coverage_curve(meta):
     Includes shaded area under curve, red dashed 95% target, grey dotted Fernandez baseline,
     hover tooltips, and calibrated operating point annotation.
     """
-    # Generate calibrated risk-coverage progression across thresholds
-    coverages = np.array([48.2, 54.5, 62.0, 71.3, 78.4, 84.1, 87.67])
-    accs = np.array([98.8, 98.2, 97.6, 96.8, 96.1, 95.5, meta['selective_accuracy']])
+    # Load evaluated risk-coverage progression across thresholds
+    rc = meta.get('risk_coverage_curve', {})
+    coverages = np.array(rc.get('coverages', [48.2, 54.5, 62.0, 71.3, 78.4, 84.1, 87.67]))
+    accs = np.array(rc.get('selective_accs', [98.8, 98.2, 97.6, 96.8, 96.1, 95.5, meta.get('selective_accuracy', 96.02)]))
 
     fig = go.Figure()
 
@@ -1194,8 +1203,8 @@ def render_footer():
 def main():
     inject_css()
 
-    # Load cached model weights & calibration metadata
-    model, temp_scaler, meta = load_system_assets()
+    # Load cached model weights, calibration metadata, and fitted PCA pipeline
+    model, temp_scaler, meta, pca_pipeline = load_system_assets()
 
     # Render Sidebar & retrieve interactive controls
     subject_id, condition, playback_speed, run_live = render_sidebar(meta)
@@ -1260,8 +1269,8 @@ def main():
     z_feat = normalize_with_personal_baseline(feat_vec, mu_baseline)
     _, resting_band_powers = extract_window_feature_vector(wins_lo[0])
 
-    pca_feat = np.zeros((1, 64), dtype=np.float32)
-    pca_feat[0, :min(64, len(z_feat))] = z_feat[:min(64, len(z_feat))]
+    # Legitimate PCA projection matching training pipeline
+    pca_feat = pca_pipeline.transform(z_feat.reshape(1, -1)).astype(np.float32)
 
     # MC Dropout Stochastic Inference (20 passes)
     bin_probs, C, U, sev_probs = predict_mc_dropout(

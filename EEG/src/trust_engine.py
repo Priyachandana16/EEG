@@ -183,16 +183,14 @@ class SelectivePredictionEngine:
         
         returns: decision_dict
         """
-        # Make it look realistic, not 'perfect' 100%
-        C_raw = float(np.max(binary_probs))
-        C = min(0.987, max(0.51, C_raw - 0.01)) 
+        # Calibrated Confidence C (maximum class probability)
+        C = float(np.max(binary_probs))
         pred_binary_class = int(np.argmax(binary_probs))
         
-        # Calculate Epistemic Uncertainty U
+        # Epistemic Uncertainty U (Normalized Predictive Shannon Entropy)
         num_classes = len(binary_probs)
         entropy = -np.sum(binary_probs * np.log2(binary_probs + 1e-12))
-        U_raw = float(np.clip(entropy / np.log2(num_classes), 0.0, 1.0))
-        U = max(0.012, min(0.49, U_raw + 0.005)) # Never exactly 0.000
+        U = float(np.clip(entropy / np.log2(num_classes), 0.0, 1.0))
 
         B = compute_baseline_consistency(z_feat)
         R = compute_composite_reliability(C, U, sqi_score, B)

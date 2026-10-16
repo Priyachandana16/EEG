@@ -1,33 +1,44 @@
 =========================================
-MODEL EVALUATION & TESTING REPORT
+MODEL EVALUATION & TESTING REPORT (AUTHENTIC)
 =========================================
-Date of Evaluation: 2026-09-30 16:29:09
 Dataset: STEW (Simultaneous Task EEG Workload)
-Validation Split: 5-Fold Cross Validation (Subject Independent)
-Total Test Epochs Evaluated: 8,450
+Subjects Evaluated: 30 Subjects
+Total Test Windows Evaluated: 600
 
 -----------------------------------------
 [BASE MODEL (Forced Prediction - No Gate)]
-Overall Accuracy: 92.50%
-Expected Calibration Error (ECE): 0.084
+Overall Accuracy: 96.17%
+Expected Calibration Error (ECE): 0.0286
 
-Classification Report:
-                  Precision    Recall  F1-Score   Support
-Class 0 (Rest)       0.91      0.94      0.92      4225
-Class 1 (Task)       0.94      0.91      0.93      4225
+Classification Report (All Test Windows):
+                  precision    recall  f1-score   support
+
+  Rest (Class 0)       1.00      0.92      0.96       300
+Stress (Class 1)       0.93      1.00      0.96       300
+
+        accuracy                           0.96       600
+       macro avg       0.96      0.96      0.96       600
+    weighted avg       0.96      0.96      0.96       600
+
 
 -----------------------------------------
 [TRUST ENGINE (Selective Prediction Gate)]
-Uncertainty Threshold (tau): 0.080
+Reliability Threshold (tau): 0.850
 Monte Carlo Passes: 20
-Coverage (Accepted Windows): 82.50%
-Abstained Windows: 17.50%
+Coverage (Accepted Windows): 66.50% (399/600)
+Abstained Windows: 33.50% (201/600)
 
-Accepted Output Accuracy: 96.02%
-Post-Temperature Scaling ECE: 0.021
+Accepted Output Accuracy: 100.00%
+Post-Temperature Scaling ECE: 0.0171
 
-Classification Report (Accepted Data Only):
-                  Precision    Recall  F1-Score   Support
-Class 0 (Rest)       0.95      0.96      0.95      3485
-Class 1 (Task)       0.96      0.94      0.95      3486
+Classification Report (Accepted Windows Only):
+                  precision    recall  f1-score   support
+
+  Rest (Class 0)       1.00      1.00      1.00       213
+Stress (Class 1)       1.00      1.00      1.00       186
+
+        accuracy                           1.00       399
+       macro avg       1.00      1.00      1.00       399
+    weighted avg       1.00      1.00      1.00       399
+
 =========================================

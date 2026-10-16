@@ -1,9 +1,38 @@
 {
-  "temperature": 1.3839453125,
-  "overall_accuracy": 88.66666666666667,
-  "selective_accuracy": 98.08612440191388,
-  "coverage": 69.66666666666667,
-  "ece_calibrated": 0.006757513284683277,
-  "ece_uncalibrated": 0.004768373767534839,
-  "threshold": 0.85
+  "temperature": 2.429531250000001,
+  "overall_accuracy": 96.16666666666667,
+  "selective_accuracy": 100.0,
+  "coverage": 66.5,
+  "ece_calibrated": 0.01709773354232316,
+  "ece_uncalibrated": 0.028552197664976138,
+  "threshold": 0.85,
+  "total_test_windows": 600,
+  "accepted_windows": 399,
+  "abstained_windows": 201,
+  "risk_coverage_curve": {
+    "coverages": [
+      99.0,
+      97.83,
+      97.17,
+      96.67,
+      95.5,
+      93.67,
+      89.0,
+      66.5,
+      24.17,
+      0.0
+    ],
+    "selective_accs": [
+      96.8,
+      97.44,
+      97.77,
+      97.93,
+      98.6,
+      99.11,
+      99.81,
+      100.0,
+      100.0,
+      100.0
+    ]
+  }
 }
