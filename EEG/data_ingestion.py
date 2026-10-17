@@ -51,17 +51,25 @@ def generate_subject_eeg_signal(is_hi_workload=False, subject_id=1, artifact_pro
             w_e = w_s + 256
             w_t = t[w_s:w_e]
 
-            # Natural window fluctuations
+            # Natural window fluctuations with symmetric biological shifts
             if not is_hi_workload:
                 # Rest state
                 a_amp = np.random.normal(11.0 if is_parieto_occipital else 8.0, 2.2) * sub_factor
                 t_amp = np.random.normal(5.2 if is_frontal else 4.0, 1.2) * sub_factor
                 b_amp = np.random.normal(7.2, 1.8) * sub_factor
+                # Periodic transient cognitive thought / alertness during rest (~6.7% of windows)
+                if (w % 15 == 4):
+                    b_amp += 3.2
+                    a_amp -= 2.6
             else:
                 # Task state: calibrated ~20% alpha attenuation, ~24% beta elevation
                 a_amp = np.random.normal(8.8 if is_parieto_occipital else 6.4, 2.2) * sub_factor
                 t_amp = np.random.normal(6.5 if is_frontal else 4.8, 1.2) * sub_factor
                 b_amp = np.random.normal(9.0, 1.8) * sub_factor
+                # Periodic transient micro-pause / relaxation during workload (~6.7% of windows)
+                if (w % 15 == 11):
+                    a_amp += 3.2
+                    b_amp -= 2.6
 
             a_amp = max(2.0, a_amp)
             t_amp = max(1.2, t_amp)

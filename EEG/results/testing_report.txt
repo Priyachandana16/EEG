@@ -7,38 +7,38 @@ Total Test Windows Evaluated: 600
 
 -----------------------------------------
 [BASE MODEL (Forced Prediction - No Gate)]
-Overall Accuracy: 95.00%
-Expected Calibration Error (ECE): 0.0412
+Overall Accuracy: 95.17%
+Expected Calibration Error (ECE): 0.0219
 
 Classification Report (All Test Windows):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)       0.99      0.91      0.95       300
-Stress (Class 1)       0.92      0.99      0.95       300
+  Rest (Class 0)     0.9656    0.9367    0.9509       300
+Stress (Class 1)     0.9385    0.9667    0.9524       300
 
-        accuracy                           0.95       600
-       macro avg       0.95      0.95      0.95       600
-    weighted avg       0.95      0.95      0.95       600
+        accuracy                         0.9517       600
+       macro avg     0.9521    0.9517    0.9517       600
+    weighted avg     0.9521    0.9517    0.9517       600
 
 
 -----------------------------------------
 [TRUST ENGINE (Selective Prediction Gate)]
-Reliability Threshold (tau): 0.850
+Reliability Threshold (tau): 0.800
 Monte Carlo Passes: 20
-Coverage (Accepted Windows): 66.33% (398/600)
-Abstained Windows: 33.67% (202/600)
+Coverage (Accepted Windows): 78.17% (469/600)
+Abstained Windows: 21.83% (131/600)
 
-Accepted Output Accuracy: 98.99%
-Post-Temperature Scaling ECE: 0.0098
+Accepted Output Accuracy: 98.72%
+Post-Temperature Scaling ECE: 0.0147
 
 Classification Report (Accepted Windows Only):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)       0.99      0.98      0.99       180
-Stress (Class 1)       0.99      1.00      0.99       218
+  Rest (Class 0)     0.9861    0.9861    0.9861       216
+Stress (Class 1)     0.9881    0.9881    0.9881       253
 
-        accuracy                           0.99       398
-       macro avg       0.99      0.99      0.99       398
-    weighted avg       0.99      0.99      0.99       398
+        accuracy                         0.9872       469
+       macro avg     0.9871    0.9871    0.9871       469
+    weighted avg     0.9872    0.9872    0.9872       469
 
 =========================================

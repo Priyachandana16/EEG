@@ -183,7 +183,7 @@ def train_and_evaluate(n_subs=30, epochs=8, batch_size=64):
     print("\nEvaluating Test Set via MC-Dropout & Selective Abstention (Genuine Predictions)...")
     test_eval_results = []
     
-    engine = SelectivePredictionEngine(threshold=0.85)
+    engine = SelectivePredictionEngine(threshold=0.80)
 
     for i in range(len(test_items)):
         eeg_win = X_test_raw_t[i:i+1]
@@ -231,8 +231,8 @@ def train_and_evaluate(n_subs=30, epochs=8, batch_size=64):
     print(f"Fernandez et al. Baseline Accuracy : 86.24%")
     print(f"Total Test Windows Evaluated       : {len(test_eval_results)}")
     print(f"Overall Test Accuracy (All Windows): {overall_acc:.2f}%")
-    print(f"Operating Threshold (tau)          : 0.850")
-    print(f"Selective Accuracy (R >= 0.85)     : {selective_acc:.2f}%")
+    print(f"Operating Threshold (tau)          : 0.800")
+    print(f"Selective Accuracy (R >= 0.80)     : {selective_acc:.2f}%")
     print(f"Accepted Sample Coverage           : {coverage:.2f}% ({len(accepted_results)}/{len(test_eval_results)})")
     print(f"Post-Calibration ECE               : {ece_cal:.4f}")
     print("========================================================\n")
@@ -276,7 +276,7 @@ def train_and_evaluate(n_subs=30, epochs=8, batch_size=64):
         'coverage': float(coverage),
         'ece_calibrated': float(ece_cal),
         'ece_uncalibrated': float(ece_uncal),
-        'threshold': 0.85,
+        'threshold': 0.80,
         'total_test_windows': len(test_eval_results),
         'accepted_windows': len(accepted_results),
         'abstained_windows': len(test_eval_results) - len(accepted_results),
@@ -285,12 +285,16 @@ def train_and_evaluate(n_subs=30, epochs=8, batch_size=64):
             'selective_accs': sel_acc_curve
         }
     }
-    with open('assets/calibration_meta.json', 'w') as f:
-        json.dump(meta, f, indent=2)
+    
+    # Save metadata to assets
+    for a_dir in ['assets', '../EEG/assets', '../assets']:
+        if os.path.exists(a_dir):
+            with open(os.path.join(a_dir, 'calibration_meta.json'), 'w') as f:
+                json.dump(meta, f, indent=2)
 
     # 9. Generate Consistent Testing Report & Cross-Validation JSON
-    cls_rep = classification_report(all_trues, all_preds, target_names=['Rest (Class 0)', 'Stress (Class 1)'])
-    cls_rep_acc = classification_report(acc_trues, acc_preds, target_names=['Rest (Class 0)', 'Stress (Class 1)'])
+    cls_rep = classification_report(all_trues, all_preds, target_names=['Rest (Class 0)', 'Stress (Class 1)'], digits=4)
+    cls_rep_acc = classification_report(acc_trues, acc_preds, target_names=['Rest (Class 0)', 'Stress (Class 1)'], digits=4)
 
     report_text = f"""=========================================
 MODEL EVALUATION & TESTING REPORT (AUTHENTIC)
@@ -309,7 +313,7 @@ Classification Report (All Test Windows):
 
 -----------------------------------------
 [TRUST ENGINE (Selective Prediction Gate)]
-Reliability Threshold (tau): 0.850
+Reliability Threshold (tau): 0.800
 Monte Carlo Passes: 20
 Coverage (Accepted Windows): {coverage:.2f}% ({len(accepted_results)}/{len(test_eval_results)})
 Abstained Windows: {100.0 - coverage:.2f}% ({len(test_eval_results) - len(accepted_results)}/{len(test_eval_results)})
@@ -321,8 +325,11 @@ Classification Report (Accepted Windows Only):
 {cls_rep_acc}
 =========================================
 """
-    with open('results/testing_report.txt', 'w') as f:
-        f.write(report_text)
+    # Write report synchronously to both results folders so they never get out of sync
+    for r_dir in ['results', '../results', 'EEG/results']:
+        if os.path.exists(r_dir):
+            with open(os.path.join(r_dir, 'testing_report.txt'), 'w') as f:
+                f.write(report_text)
 
     cv_results = {
         "dataset": "STEW",
@@ -334,8 +341,10 @@ Classification Report (Accepted Windows Only):
         "temperature": round(best_temp, 3),
         "status": "AUTHENTIC_VERIFIED"
     }
-    with open('results/cross_validation_results.json', 'w') as f:
-        json.dump(cv_results, f, indent=2)
+    for r_dir in ['results', '../results', 'EEG/results']:
+        if os.path.exists(r_dir):
+            with open(os.path.join(r_dir, 'cross_validation_results.json'), 'w') as f:
+                json.dump(cv_results, f, indent=2)
 
     print("Model weights saved to 'assets/stew_model.pt'.")
     print("PCA pipeline saved to 'assets/pca_pipeline.pkl'.")

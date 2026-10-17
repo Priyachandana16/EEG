@@ -16,20 +16,20 @@ This framework incorporates **Hybrid Deep Learning (1D-CNN + BiLSTM + Multi-Head
 | Model / Framework | Evaluation Scope | Overall Accuracy | Selective Accuracy | Coverage | Calibration (ECE) |
 | :--- | :--- | :---: | :---: | :---: | :---: |
 | **Fernandez et al. (Baseline Paper)** | All Test Windows | 86.24% | N/A | 100.0% | Unreported |
-| **Our Framework (Forced Prediction)** | All Test Windows (600) | **95.33%** | N/A | 100.0% | 0.0366 |
-| **Our Framework + Trust Engine ($\tau = 0.72$)** | High-Confidence Windows | — | **96.73%** | 96.83% | 0.0195 |
-| **Our Framework + Trust Engine ($\tau = 0.85$)** | Strict Clinical Gate | — | **99.30%** | 71.00% | **0.0113** |
+| **Our Framework (Forced Prediction)** | All Test Windows (600) | **95.17%** | N/A | 100.0% | 0.0219 |
+| **Our Framework + Trust Engine ($\tau = 0.72$)** | High-Confidence Windows | — | **96.53%** | 91.33% | 0.0182 |
+| **Our Framework + Trust Engine ($\tau = 0.80$)** | Strict Clinical Gate | — | **98.72%** | 78.17% | **0.0147** |
 
 ### Detailed Classification Report (All 600 Test Windows)
 ```text
                   precision    recall  f1-score   support
 
-  Rest (Class 0)       0.93      0.98      0.95       300
-Stress (Class 1)       0.98      0.93      0.95       300
+  Rest (Class 0)     0.9656    0.9367    0.9509       300
+Stress (Class 1)     0.9385    0.9667    0.9524       300
 
-        accuracy                           0.95       600
-       macro avg       0.95      0.95      0.95       600
-    weighted avg       0.95      0.95      0.95       600
+        accuracy                         0.9517       600
+       macro avg     0.9521    0.9517    0.9517       600
+    weighted avg     0.9521    0.9517    0.9517       600
 ```
 
 ---

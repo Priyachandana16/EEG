@@ -739,19 +739,26 @@ def render_sidebar(meta):
 
         st.markdown("<div class='sidebar-section-label'>📊 Benchmark Metrics</div>", unsafe_allow_html=True)
 
-        ai_acc = meta.get('selective_accuracy', 96.02)
-        cal_temp = meta.get('temperature', 1.0)
+        test_acc = meta.get('overall_accuracy', 95.00)
+        sel_acc = meta.get('selective_accuracy', 98.99)
+        cal_temp = meta.get('temperature', 1.928)
 
         # Compact Benchmark KPI Cards
         st.markdown(f"""
         <div class='bench-metric-card'>
-            <div class='bench-metric-label'>Fernandez Benchmark</div>
+            <div class='bench-metric-label'>Fernandez Baseline</div>
             <div class='bench-metric-value' style='color:#94A3B8;'>86.24%</div>
         </div>
         <div class='bench-metric-card'>
-            <div class='bench-metric-label'>Our AI Accuracy</div>
+            <div class='bench-metric-label'>Our Model Test Accuracy</div>
             <div class='bench-metric-value' style='color:#10B981;'>
-                {ai_acc:.2f}% 
+                {test_acc:.2f}% 
+            </div>
+        </div>
+        <div class='bench-metric-card'>
+            <div class='bench-metric-label'>Selective Gate (R ≥ {meta.get('threshold', 0.85):.2f})</div>
+            <div class='bench-metric-value' style='color:#22D3EE;'>
+                {sel_acc:.2f}%
             </div>
         </div>
         <div class='bench-metric-card'>
