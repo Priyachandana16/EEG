@@ -1,0 +1,3 @@
+[submodule "EEG/data/stew"]
+	path = EEG/data/stew
+	ignore = all
