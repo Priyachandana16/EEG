@@ -580,7 +580,7 @@ def render_header(current_sqi=0.95):
         </p>
         <div style='margin-bottom: 12px;'>
             <span class='hero-pill'>STEW Dataset (48 Subjects)</span>
-            <span class='hero-pill'>Selective Abstention (τ ≥ 0.85)</span>
+            <span class='hero-pill'>Selective Abstention (τ ≥ 0.80)</span>
             <span class='hero-pill'>Monte Carlo Dropout (M = 20)</span>
             <span class='hero-pill'>128 Hz Emotiv 14-Ch</span>
         </div>
@@ -756,7 +756,7 @@ def render_sidebar(meta):
             </div>
         </div>
         <div class='bench-metric-card'>
-            <div class='bench-metric-label'>Selective Gate (R ≥ {meta.get('threshold', 0.85):.2f})</div>
+            <div class='bench-metric-label'>Selective Gate (R ≥ {meta.get('threshold', 0.80):.2f})</div>
             <div class='bench-metric-value' style='color:#22D3EE;'>
                 {sel_acc:.2f}%
             </div>
@@ -769,7 +769,7 @@ def render_sidebar(meta):
 
         st.markdown("""
         <div style='margin-top: 24px; padding: 12px; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); font-size: 0.72rem; color: #64748B;'>
-            <b>Operating Policy:</b> Rejection threshold τ = 0.85 ensures highly robust operational accuracy on biosignal anomalies.
+            <b>Operating Policy:</b> Rejection threshold τ = 0.80 ensures highly robust operational accuracy on biosignal anomalies.
         </div>
         """, unsafe_allow_html=True)
 
@@ -890,24 +890,29 @@ def render_decision_panel(decision, cal_thresh, condition):
     st.markdown(html, unsafe_allow_html=True)
 
 
-def render_reliability_tiles(decision):
+def render_reliability_tiles(decision, meta=None):
     """
     Renders 4 KPI tiles in a clean 1x4 responsive grid.
     Each tile features a large mono number, muted label, and a mini progress bar.
     """
+    if meta is None:
+        meta = {}
     cols = st.columns(4)
 
-    # Tile 1: Calibrated Confidence
+    # Tile 1: Posterior Confidence on Currently Streamed 2-second Window
     conf_pct = decision['confidence_C'] * 100.0
+    model_test_acc = meta.get('overall_accuracy', 95.8)
     with cols[0]:
         st.markdown(f"""
         <div class='kpi-tile'>
-            <div class='kpi-label'>Calibrated Confidence (C)</div>
+            <div class='kpi-label'>Active Window Confidence (C)</div>
             <div class='kpi-value' style='color:#22D3EE;'>{conf_pct:.1f}%</div>
             <div class='kpi-progress-track'>
                 <div class='kpi-progress-fill' style='width: {min(100.0, max(0.0, conf_pct))}%; background: linear-gradient(90deg, #0D9488, #22D3EE);'></div>
             </div>
-            <div style='font-size:0.7rem; color:#64748B; margin-top:8px;'>Higher is better</div>
+            <div style='font-size:0.75rem; color:#94A3B8; margin-top:8px;'>
+                Current 2s slice probability<br><span style='color:#10B981; font-weight:600;'>Model Test Acc: {model_test_acc:.2f}%</span>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -1338,7 +1343,7 @@ def main():
             <p class='section-subtitle'>Decomposition of Composite Reliability R into confidence, signal quality, uncertainty, and baseline consistency.</p>
         </div>
     """, unsafe_allow_html=True)
-    render_reliability_tiles(decision)
+    render_reliability_tiles(decision, meta)
 
     # -------------------------------------------------------------------------
     # ROW 6: XAI RHYTHM BAR CHART | COMPOSITE RELIABILITY GAUGE

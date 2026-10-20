@@ -32,6 +32,17 @@ from src.trust_engine import (
 
 DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
+def set_reproducible_seed(seed=42):
+    import random
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
+
 
 def build_subject_features_and_windows(n_subs=30, max_wins_per_cond=60):
     """
@@ -94,7 +105,8 @@ def build_subject_features_and_windows(n_subs=30, max_wins_per_cond=60):
     return subject_data
 
 
-def train_and_evaluate(n_subs=30, epochs=8, batch_size=64):
+def train_and_evaluate(n_subs=30, epochs=8, batch_size=64, seed=42):
+    set_reproducible_seed(seed)
     os.makedirs('assets', exist_ok=True)
     os.makedirs('results', exist_ok=True)
     
@@ -134,10 +146,13 @@ def train_and_evaluate(n_subs=30, epochs=8, batch_size=64):
     X_val_raw_t, X_val_pca_t, y_val_bin, y_val_sev, _ = prepare_tensors(val_items)
     X_test_raw_t, X_test_pca_t, y_test_bin, y_test_sev, test_sqis = prepare_tensors(test_items)
 
+    g = torch.Generator()
+    g.manual_seed(seed)
     train_ds = TensorDataset(X_train_raw_t, X_train_pca_t, y_train_bin, y_train_sev)
-    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True, generator=g)
 
-    # 3. Model Initialization
+    # 3. Model Initialization (Deterministic)
+    set_reproducible_seed(seed)
     model = HybridNeuroNet(in_channels=14, feature_dim=64, lstm_hidden=64, num_heads=4, dropout_rate=0.3).to(DEVICE)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1e-3, weight_decay=1e-4)
     criterion_bin = nn.CrossEntropyLoss()

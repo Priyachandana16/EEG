@@ -79,7 +79,7 @@ Raw 14-Channel EEG (128 Hz)
      ┌──────────────┴──────────────┐
      ▼                             ▼
 [ Accepted Decision ]       [ Clinical Abstention ]
-  (High Certainty 99.30%)     ("Signal noisy / ambiguous - Review manually")
+  (High Certainty 98.09%)     ("Signal noisy / ambiguous - Review manually")
 ```
 
 ---
@@ -88,7 +88,7 @@ Raw 14-Channel EEG (128 Hz)
 
 ### 1. Why is `calibration_meta.json` present in `assets/`?
 In standard **MLOps production pipelines**, models do not recalculate post-hoc temperature calibration constants, baseline validation errors, or empirical risk-coverage curves from scratch on every user interface interaction. 
-- During model training (`train_and_verify.py`), post-hoc validation calibration optimizes a scalar **Temperature ($T = 2.14$)** to align model probabilities with true likelihoods.
+- During model training (`train_and_verify.py`), post-hoc validation calibration optimizes a scalar **Temperature ($T = 1.15$)** to align model probabilities with true likelihoods.
 - This parameter, along with benchmark reference curves, is saved in `assets/calibration_meta.json`.
 - When the interactive Streamlit dashboard runs, it loads $T$ to calibrate real-time neural network logits dynamically (`calibrated_probs = softmax(logits / T)`). 
 - Every incoming EEG window is passed **live through the PyTorch neural network**, computing real-time Monte Carlo Dropout uncertainty and Signal Quality Indices on the fly. Caching fixed calibration constants in metadata is standard industry practice.
@@ -98,8 +98,8 @@ In medical and high-consequence AI, forced classification is dangerous. If a pat
 - Our **Trust Engine** computes a unified reliability score $R$:
   $$R = 0.35 \cdot C + 0.25 \cdot (1 - U) + 0.25 \cdot \text{SQI} + 0.15 \cdot B$$
   where $C$ is maximum softmax confidence, $U$ is normalized Shannon entropy from MC-Dropout passes, $\text{SQI}$ is the hardware signal quality index, and $B$ is physiological baseline proximity.
-- When $R \ge 0.85$, the model delivers high-confidence predictions (**99.30% accuracy**).
-- When $R < 0.85$, the system abstains and requests sensor readjustment or clinical inspection, eliminating spurious predictions.
+- When $R \ge 0.80$, the model delivers high-confidence predictions (**98.09% accuracy**).
+- When $R < 0.80$, the system abstains and requests sensor readjustment or clinical inspection, eliminating spurious predictions.
 
 ### 3. Leakage-Free Dimensionality Reduction (PCA Pipeline)
 Many EEG literature implementations improperly fit PCA on the entire dataset prior to splitting, introducing data leakage. 
