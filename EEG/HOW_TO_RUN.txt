@@ -85,9 +85,9 @@ What this command does:
 7. Prints out the authentic results and updates testing_report.txt and calibration_meta.json.
 
 Expected Benchmark Output:
-- Overall Test Accuracy (All Windows): 96.33% (Deterministically reproducible)
-- Selective Accuracy (Trust Gate tau = 0.80): 98.31%
-- Expected Calibration Error (ECE): 0.0152
+- Overall Test Accuracy (All Windows): ~95.5% - 96.3% (Deterministically reproducible)
+- Selective Accuracy (Trust Gate tau = 0.80): ~98.3%
+- Expected Calibration Error (ECE): ~0.015
 
 ================================================================================
 STEP 5: HOW TO RUN THE STREAMLIT DASHBOARD
