@@ -7,38 +7,38 @@ Total Test Windows Evaluated: 600
 
 -----------------------------------------
 [BASE MODEL (Forced Prediction - No Gate)]
-Overall Accuracy: 96.33%
-Expected Calibration Error (ECE): 0.0134
+Overall Accuracy: 95.50%
+Expected Calibration Error (ECE): 0.0213
 
 Classification Report (All Test Windows):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)     0.9696    0.9567    0.9631       300
-Stress (Class 1)     0.9572    0.9700    0.9636       300
+  Rest (Class 0)     0.9756    0.9333    0.9540       300
+Stress (Class 1)     0.9361    0.9767    0.9560       300
 
-        accuracy                         0.9633       600
-       macro avg     0.9634    0.9633    0.9633       600
-    weighted avg     0.9634    0.9633    0.9633       600
+        accuracy                         0.9550       600
+       macro avg     0.9559    0.9550    0.9550       600
+    weighted avg     0.9559    0.9550    0.9550       600
 
 
 -----------------------------------------
 [TRUST ENGINE (Selective Prediction Gate)]
 Reliability Threshold (tau): 0.800
 Monte Carlo Passes: 20
-Coverage (Accepted Windows): 88.67% (532/600)
-Abstained Windows: 11.33% (68/600)
+Coverage (Accepted Windows): 87.83% (527/600)
+Abstained Windows: 12.17% (73/600)
 
-Accepted Output Accuracy: 98.31%
-Post-Temperature Scaling ECE: 0.0152
+Accepted Output Accuracy: 98.29%
+Post-Temperature Scaling ECE: 0.0158
 
 Classification Report (Accepted Windows Only):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)     0.9921    0.9729    0.9824       258
+  Rest (Class 0)     0.9919    0.9723    0.9820       253
 Stress (Class 1)     0.9749    0.9927    0.9837       274
 
-        accuracy                         0.9831       532
-       macro avg     0.9835    0.9828    0.9831       532
-    weighted avg     0.9832    0.9831    0.9831       532
+        accuracy                         0.9829       527
+       macro avg     0.9834    0.9825    0.9829       527
+    weighted avg     0.9831    0.9829    0.9829       527
 
 =========================================
