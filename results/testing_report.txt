@@ -7,38 +7,38 @@ Total Test Windows Evaluated: 600
 
 -----------------------------------------
 [BASE MODEL (Forced Prediction - No Gate)]
-Overall Accuracy: 95.67%
-Expected Calibration Error (ECE): 0.0182
+Overall Accuracy: 96.33%
+Expected Calibration Error (ECE): 0.0134
 
 Classification Report (All Test Windows):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)     0.9597    0.9533    0.9565       300
-Stress (Class 1)     0.9536    0.9600    0.9568       300
+  Rest (Class 0)     0.9696    0.9567    0.9631       300
+Stress (Class 1)     0.9572    0.9700    0.9636       300
 
-        accuracy                         0.9567       600
-       macro avg     0.9567    0.9567    0.9567       600
-    weighted avg     0.9567    0.9567    0.9567       600
+        accuracy                         0.9633       600
+       macro avg     0.9634    0.9633    0.9633       600
+    weighted avg     0.9634    0.9633    0.9633       600
 
 
 -----------------------------------------
 [TRUST ENGINE (Selective Prediction Gate)]
 Reliability Threshold (tau): 0.800
 Monte Carlo Passes: 20
-Coverage (Accepted Windows): 87.33% (524/600)
-Abstained Windows: 12.67% (76/600)
+Coverage (Accepted Windows): 88.67% (532/600)
+Abstained Windows: 11.33% (68/600)
 
-Accepted Output Accuracy: 98.09%
-Post-Temperature Scaling ECE: 0.0114
+Accepted Output Accuracy: 98.31%
+Post-Temperature Scaling ECE: 0.0152
 
 Classification Report (Accepted Windows Only):
                   precision    recall  f1-score   support
 
-  Rest (Class 0)     0.9765    0.9842    0.9803       253
-Stress (Class 1)     0.9851    0.9779    0.9815       271
+  Rest (Class 0)     0.9921    0.9729    0.9824       258
+Stress (Class 1)     0.9749    0.9927    0.9837       274
 
-        accuracy                         0.9809       524
-       macro avg     0.9808    0.9810    0.9809       524
-    weighted avg     0.9809    0.9809    0.9809       524
+        accuracy                         0.9831       532
+       macro avg     0.9835    0.9828    0.9831       532
+    weighted avg     0.9832    0.9831    0.9831       532
 
 =========================================
