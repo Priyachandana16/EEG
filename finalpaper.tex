@@ -60,7 +60,7 @@ harikagajj12@gmail.com}
 \maketitle
 
 \begin{abstract}\mdseries
-EEG-based stress detection is a non-invasive measurement technique that offers objective detection of cognitive load and psychological health. However, deep learning classifiers face significant challenges due to high inter-subject physiological variability, susceptibility to ocular and muscular artifacts, overconfident predictions, and a lack of abstention capabilities when incoming biosignals are corrupted or ambiguous. To address these limitations, this paper presents an adaptive cognitive stress detection framework equipped with a multi-factor ``Trust Engine''. The architecture applies bandpass filtering (0.5--45~Hz), 50~Hz notch filtering, and computes a Signal Quality Index (SQI) over 2.0-second non-overlapping windows across 14-channel EEG signals. Extracted features are passed into a hybrid Multi-Scale 1D Convolutional Neural Network (CNN), 2-layer 64-hidden-unit Bidirectional Long Short-Term Memory (BiLSTM), and a 4-head Scaled Dot-Product Self-Attention network, normalized against resting personal baselines. A reliability engine estimates real-time epistemic uncertainty using post-hoc Temperature Scaling ($T = 1.29$) alongside 20 Monte Carlo (MC) Dropout stochastic forward passes. Through selective prediction, the system abstains on ambiguous windows, achieving an empirical forced-prediction accuracy of 95.50\% and an accepted output accuracy of 98.29\%, markedly outperforming conventional forced-prediction baselines. The framework is deployed on an interactive, zero-latency dashboard built with Streamlit, Plotly, and PyTorch. Experimental results on the STEW benchmark demonstrate an Expected Calibration Error (ECE) of 0.0158, establishing a clinically reliable decision-support system where only high-confidence inferences are accepted and perilous false positives are eliminated.
+Objective cognitive stress assessment via electroencephalography (EEG) provides valuable clinical and operational insights into neural workload. However, contemporary deep learning architectures frequently struggle with ocular and electromyographic artifacts, uncalibrated overconfident predictions, and a rigid forced-classification paradigm that mandates decisions even on corrupted epochs. To address these vulnerabilities, this paper introduces an adaptive cognitive stress detection framework anchored by an epistemic ``Trust Engine''. The signal pipeline implements bandpass filtering (0.5--45~Hz), 50~Hz notch filtering, and real-time Signal Quality Index (SQI) computation across 2.0-second non-overlapping windows from 14-channel EEG recordings. Extracted temporal-spectral features are processed through a hybrid Multi-Scale 1D Convolutional Neural Network (CNN), a 2-layer Bidirectional Long Short-Term Memory (BiLSTM) network, and a 4-head Scaled Dot-Product Self-Attention mechanism, standardized against individual resting baselines. Epistemic uncertainty is quantified through 20 Monte Carlo (MC) Dropout stochastic iterations coupled with post-hoc Temperature Scaling ($T = 1.29$). By implementing selective prediction, the system abstains on ambiguous or noisy epochs, achieving a baseline forced-prediction accuracy of 95.50\% and an accepted decision accuracy of 98.29\%, significantly exceeding traditional deterministic baselines. The pipeline is integrated into an interactive, zero-latency executive dashboard developed with Streamlit, Plotly, and PyTorch. On the STEW benchmark, the framework achieves an Expected Calibration Error (ECE) of 0.0158, delivering a dependable decision-support system that safeguards high-stakes clinical and operational tasks against deceptive false positives.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -200,8 +200,7 @@ U = - \frac{1}{\log K} \sum_{k=1}^K \bar{p}_k \log \bar{p}_k
 where $\bar{p}_k = \frac{1}{M} \sum_{m=1}^M \hat{p}_{k}^{(m)}$ is the mean probability for class $k$ across the $M$ stochastic forward passes.
 
 \subsection{The Selective Prediction Gate (Step 10)}
-The system employs a multi-factor reliability engine that calculates a composite score $R = 0.35 C + 0.25 (1 - U) + 0.25 \text{SQI} + 0.15 B$, and enforces a strict safety gate governed by threshold $\tau = 0.80$:
-
+The framework integrates a multi-factor reliability engine that computes a composite score $R = 0.35 C + 0.25 (1 - U) + 0.25 \text{SQI} + 0.15 B$, enforcing a selective prediction gate with safety threshold $\tau = 0.80$:
 \begin{equation}
 \text{Decision} = 
 \begin{cases} 
@@ -238,7 +237,7 @@ The model is trained for more than 150 epochs using the Adam optimizer with an i
 \subsection{Classification Performance Comparison}
 The proposed spatial-temporal architecture is compared against the foundational machine learning baseline in Table~\ref{tab:perf_comp}. In the benchmark established by Fernandez et al. (2021), an accuracy of 86.24\% was attained under standard forced deterministic classification across all validation segments.
 
-Under identical forced-prediction evaluation across all 600 unseen test windows, our baseline CNN-BiLSTM-Attention network attains 95.50\% overall accuracy, confirming the efficacy of adaptive baseline normalization and multi-scale feature extraction. When the Trust Engine selective prediction gate is activated, low-reliability and artifact-corrupted windows are systematically abstained, elevating accepted decision accuracy to an authentic 98.29\%.
+Across all 600 unseen test segments under deterministic forced prediction, the baseline CNN-BiLSTM-Attention architecture achieves 95.50\% overall classification accuracy, demonstrating the effectiveness of adaptive baseline normalization and multi-scale feature extraction. When the Trust Engine selective prediction gate is enabled, noisy and ambiguous epochs are systematically withheld, raising accepted diagnostic accuracy to 98.29\%.
 \begin{table}[htbp]
 \renewcommand{\arraystretch}{1.4}
 \caption{Classification Performance Across Machine Learning Models}
@@ -259,8 +258,7 @@ Base Paper (Fernandez et al., 2021) & Forced (100\%) & 86.24\% \\
 \end{table}
 
 \subsection{Confidence Calibration and Temperature Scaling}
-As demonstrated in Table~\ref{tab:ece}, standard uncalibrated deep models frequently display severe overconfidence. Through post-hoc temperature optimization ($T = 1.29$), the Expected Calibration Error (ECE) is reduced from 0.0213 down to 0.0158. This statistical calibration ensures that the network's predicted posterior confidence reflects empirical correctness, establishing a mathematically sound basis for selective abstention.
-
+As reported in Table~\ref{tab:ece}, standard uncalibrated deep models frequently display significant probability miscalibration. Through post-hoc temperature optimization ($T = 1.29$), the Expected Calibration Error (ECE) is reduced from 0.0213 down to 0.0158. This statistical alignment ensures that the network's predicted posterior confidence reflects empirical correctness, establishing a mathematically sound basis for selective abstention.
 \begin{table}[htbp]
 \renewcommand{\arraystretch}{1.4}
 \caption{Calibration Metrics Pre- and Post-Temperature Scaling}
@@ -280,10 +278,9 @@ After Temperature Scaling ($T = 1.29$) & \textbf{0.0158} & \textbf{Highly Calibr
 \end{table}
 
 \subsection{Selective Prediction and Risk-Coverage Trade-off}
-The primary clinical benefit of the framework is evidenced in the Risk-Coverage trade-off (Table~\ref{tab:selective}). At the optimal reliability operating point $\tau = 0.80$, the model accepts 87.83\% of test windows (527 out of 600 windows) while abstaining on 12.17\% (73 windows) deemed physiologically ambiguous or noisy.
+The primary clinical benefit of the framework is illustrated by the Risk-Coverage trade-off in Table~\ref{tab:selective}. At the optimal operating threshold $\tau = 0.80$, the model accepts 87.83\% of test windows (527 out of 600 windows) while abstaining on 12.17\% (73 windows) flagged as physiologically ambiguous or noise-corrupted.
 
-By withholding predictions on these uncertain segments, accepted classification accuracy increases from 95.50\% to 98.29\%. When the operating policy is tightened to $\tau = 0.90$, accuracy reaches 98.94\%, validating our central hypothesis: diagnostic reliability is substantially enhanced when deep networks are empowered to abstain on low-quality biosignals.
-
+By withholding decisions on these uncertain segments, classification accuracy on accepted windows increases from 95.50\% to 98.29\%. When the operating policy is tightened to $\tau = 0.90$, accuracy reaches 98.94\%, confirming the central thesis: diagnostic reliability is substantially heightened when deep networks are empowered to abstain on compromised biosignals.
 \begin{table}[htbp]
 \renewcommand{\arraystretch}{1.4}
 \caption{Risk-Coverage Trade-off Under Selective Prediction}
@@ -305,11 +302,9 @@ $\tau = 0.90$ (Strict) & 78.67\% & 98.94\% & Retain High-Purity \\
 \end{table}
 
 \section{CONCLUSION AND FUTURE WORK}
-This research proposed a selective cognitive stress detection system that resolves the critical vulnerability of forced-prediction paradigms in neural biosignal analysis. The hybrid CNN-BiLSTM-Attention architecture, combined with a multi-factor Trust Engine, enables robust classification while autonomously withholding decisions on corrupted or ambiguous epochs.
+This paper presented a selective cognitive stress detection framework that resolves the fundamental vulnerability of the forced-prediction paradigm in EEG analysis. By pairing a hybrid CNN-BiLSTM-Attention architecture with a multi-factor Trust Engine, the system maintains robust classification accuracy while autonomously withholding decisions on degraded or epistemically ambiguous epochs.
 
-Post-hoc Temperature Scaling and Monte Carlo Dropout uncertainty modeling effectively calibrated the network, achieving a post-calibration ECE of 0.0158. Crucially, the selective prediction gate identified and deferred the most uncertain 12.17\% of temporal windows, elevating classification accuracy from 95.50\% to 98.29\% on accepted windows. Accompanied by a zero-latency executive dashboard developed with Python Streamlit, Plotly, and PyTorch, the framework provides an accessible, clinically dependable decision-support system tailored for surgical monitoring, aeronautical workload management, and high-consequence environments where false positives carry severe risks.
-
-Future developmental trajectories will involve training the baseline normalization parameters to dynamically adapt to diurnal physiological changes via low-rank adaptation (LoRA) for on-edge continuous fine-tuning.
+Post-hoc Temperature Scaling ($T = 1.29$) and Monte Carlo Dropout effectively calibrated network confidence, lowering the Expected Calibration Error to 0.0158. By withholding predictions on the 12.17\% most uncertain temporal windows, the selective prediction mechanism elevated accepted classification accuracy from 95.50\% to 98.29\%. Integrated into a zero-latency interactive dashboard built with Python Streamlit, Plotly, and PyTorch, the framework delivers a dependable clinical decision-support tool well suited for surgical monitoring, aviation workloads, and safety-critical environments. Future work will investigate dynamic baseline adaptation to diurnal physiological variations via low-rank adaptation (LoRA) for on-edge continuous personalization.
 \begin{thebibliography}{00}
 \bibitem{b1} W. L. Lim, O. Sourina, and L. P. Wang, ``STEW: Simultaneous Task EEG Workload Data Set,'' \textit{IEEE Transactions on Neural Systems and Rehabilitation Engineering}, vol. 26, no. 11, pp. 2106--2114, Nov. 2018.
 \bibitem{b2} J. Fernandez, R. Mart{\'i}nez, B. Innocenti, and B. Lopez, ``Contribution of EEG Signals for Students' Stress Detection,'' \textit{IEEE Transactions on Affective Computing}, 2021.
